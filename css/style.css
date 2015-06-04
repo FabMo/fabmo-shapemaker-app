@@ -1,0 +1,31 @@
+
+a:link {
+color:#3399CC;
+font-family:"Lucida Console", Monaco, monospace;
+font-size:150%;
+text-decoration:none;
+position:absolute;
+top:400px;
+left:95px;
+}
+
+a.startover:link {
+color:#009900;
+font-family:"Lucida Console", Monaco, monospace;
+font-size:100%;
+text-decoration:none;
+position:absolute;
+top:20px;
+left:100px;
+}
+
+a.startover:hover {
+color:#00ff00;
+}
+
+
+a:hover {
+color:#FFFF00; 
+}
+
+body {background-color:#808080;}

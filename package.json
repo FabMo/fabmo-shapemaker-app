@@ -1,0 +1,10 @@
+{
+	"name":"PartMaker",
+	"main":"./index.html",
+	"icon":"icon.png",
+	"icon_color":"green",
+	"version":"0.0.2",
+	"author":"Jonathan Ward",
+	"website":"http://github.com/FabMo/fabmo-partmaker-app",
+	"description":"Interactive toolpathing using processing.js"
+}

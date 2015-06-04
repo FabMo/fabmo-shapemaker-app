@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Part Maker</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+
+	<body>
+		<canvas id="mycanvas" data-processing-sources="partmaker.pde"></canvas>
+		<a id="download-link" style="display:none;"><b>DOWNLOAD GCODE</b></a>
+		<p><a id="reload" class="startover" style="display:none;"><b>NEW PART</b></a>
+
+		<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+		<script type="text/javascript" src="js/processing.min.js"></script>
+		<script type="text/javascript" src="js/dat.gui.min.js"></script>
+		<script type="text/javascript" src="js/dashboard.js"></script>
+		<script>
+			var pjs;
+			
+			$(document).ready(function() {
+				getPjsInstance();
+			});
+
+			// obtain a reference to the processing sketch
+			function getPjsInstance() {
+				var bound = false;
+				pjs = Processing.getInstanceById('mycanvas');
+				if(pjs != null)
+					bound = true;
+				if(!bound)
+					setTimeout(getPjsInstance, 250);
+			} 
+
+			// create the event that resizes the sketch when the window is resized
+			$(window).resize(function() {	
+				pjs.resizeSketch();
+			});
+		</script>
+	</body>
+</html>
