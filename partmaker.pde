@@ -873,228 +873,179 @@ void makeheart()
 	z = obj.cut_depth;
 	pn = obj.pn;
 	pd = z/pn;
-}
-    
-
-
-/////////////////////////////////////////////////
+}    
 
 void makerose(){   
-//first pass
-z = pd;
-int pn2 = pn - 1;
-  
-for (int i = 0; i <= verts; i++) 
-{
-////////////////////////////////
-T=(TWO_PI*obj.d/verts*i);
+	//first pass
+	z = pd;
+	int pn2 = pn - 1;
+	  
+	for (int i = 0; i <= verts; i++) {
+		T=(TWO_PI*obj.d/verts*i);
 
-float r=cos(obj.n/obj.d*T+rotate)+obj.o;
-x = pX/sf-r*sin(T)*(radius);
-y = pY/sf-r*cos(T)*(radius);
-/////////////////////////////////
+		float r=cos(obj.n/obj.d*T+rotate)+obj.o;
+		x = pX/sf-r*sin(T)*(radius);
+		y = pY/sf-r*cos(T)*(radius);
 
-if (i == 0) 
-{
-gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);//for drawing
-gcode = splice(gcode,"f" + feedrate,1);
-}
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-//done first pass
+		if (i == 0) {
+			gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
+			gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+			gcode = splice(gcode,"g4p0.5",1);//for drawing
+			gcode = splice(gcode,"f" + feedrate,1);
+		}
+		else {
+			gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+		}
+	}
 
-//if multiple pass
-while (pn2 != 0)
-{
-pd = pd + z;
-for (int i = 0; i <= verts; i++) 
-{
+	//if multiple pass
+	while (pn2 != 0)
+	{
+		pd = pd + z;
+		for (int i = 0; i <= verts; i++) 
+		{
+			int k = obj.n/obj.d;
+			if ((k & 1) == 0) {
+				float T=(TWO_PI*2*obj.d/verts*i);//even
+			} else {
+				float T=(TWO_PI*obj.d/verts*i);//odd
+			}
 
+			float r=cos(obj.n/obj.d*T+rotate)+obj.o;
+			x = pX/sf-r*sin(T)*(radius);
+			y = pY/sf-r*cos(T)*(radius);
 
-////////////////////////////////
-int k = obj.n/obj.d;
-if ((k & 1) == 0) {
-float T=(TWO_PI*2*obj.d/verts*i);//even
-} else {
-float T=(TWO_PI*obj.d/verts*i);//odd
-}
+			if (i == 0) 
+			{
+				gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+				gcode = splice(gcode,"g4p0.5",1);
+				gcode = splice(gcode,"f" + feedrate,1);
+				gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+			}
+			else 
+			{
+				gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+			}
+		} 
+		pn2 = pn2 -1;
+	}
 
-float r=cos(obj.n/obj.d*T+rotate)+obj.o;
-x = pX/sf-r*sin(T)*(radius);
-y = pY/sf-r*cos(T)*(radius);
-/////////////////////////////////
-
-
-
-if (i == 0) 
-{
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"f" + feedrate,1);
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-pn2 = pn2 -1;
-}
-gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
-//reset
-z = obj.cut_depth;
-pn = obj.pn;
-pd = z/pn;
+	gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
+	//reset
+	z = obj.cut_depth;
+	pn = obj.pn;
+	pd = z/pn;
 }
 
+void makebutterfly() {   
+	//first pass
+	z = pd;
+	int pn2 = pn - 1;
+	  
+	for (int i = 0; i <= verts; i++) {
+		float T=(TWO_PI/verts*i);
+		float e=exp(1.0);
+		float r=pow(e,sin(T))-(2*cos(4*T))+pow(sin((2*T-PI)/24),5);
 
-/////////////////////////////////////////////////
+		x = pX/sf+r*cos(T-rotate)*(radius/3);
+		y = pY/sf+r*sin(T-rotate)*(radius/3);
 
-void makebutterfly(){   
-//first pass
-z = pd;
-int pn2 = pn - 1;
-  
-for (int i = 0; i <= verts; i++) 
-{
-////////////////////////////////
-float T=(TWO_PI/verts*i);
-float e=exp(1.0);
-float r=pow(e,sin(T))-(2*cos(4*T))+pow(sin((2*T-PI)/24),5);
+		if (i == 0) {
+		gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
+		gcode = splice(gcode,"g4p0.5",1);
+		gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+		gcode = splice(gcode,"g4p0.5",1);
+		gcode = splice(gcode,"f" + feedrate,1);
+		}
+		else {
+		gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+		}
+	} 
 
-x = pX/sf+r*cos(T-rotate)*(radius/3);
-y = pY/sf+r*sin(T-rotate)*(radius/3);
-/////////////////////////////////
+	//if multiple pass
+	while (pn2 != 0) {
+		pd = pd + z;
+		for (int i = 0; i <= verts; i++) {
+			float T=(TWO_PI/verts*i);
+			float e=exp(1.0);
+			float r=pow(e,sin(T))-(2*cos(4*T))+pow(sin((2*T-PI)/24),5);
 
-if (i == 0) 
-{
-gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"f" + feedrate,1);
+			x = pX/sf+r*cos(T-rotate)*(radius/3);
+			y = pY/sf+r*sin(T-rotate)*(radius/3);
+
+			if (i == 0) {
+				gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+				gcode = splice(gcode,"g4p0.5",1);
+				gcode = splice(gcode,"f" + feedrate,1);
+				gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+			}
+			else {
+				gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+			}
+		} 
+		pn2 = pn2 -1;
+	}
+	gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
+	
+	//reset
+	z = obj.cut_depth;
+	pn = obj.pn;
+	pd = z/pn;
 }
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-//done first pass
-
-//if multiple pass
-while (pn2 != 0)
-{
-pd = pd + z;
-for (int i = 0; i <= verts; i++) 
-{
-
-
-////////////////////////////////
-float T=(TWO_PI/verts*i);
-float e=exp(1.0);
-float r=pow(e,sin(T))-(2*cos(4*T))+pow(sin((2*T-PI)/24),5);
-
-x = pX/sf+r*cos(T-rotate)*(radius/3);
-y = pY/sf+r*sin(T-rotate)*(radius/3);
-/////////////////////////////////
-
-
-
-if (i == 0) 
-{
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"f" + feedrate,1);
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-pn2 = pn2 -1;
-}
-gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
-//reset
-z = obj.cut_depth;
-pn = obj.pn;
-pd = z/pn;
-}
-
-/////////////////////////////////////////////////
 
 void makeporcupine(){   
-//first pass
-z = pd;
-int pn2 = pn - 1;
-  
-for (int i = 0; i <= verts; i++) 
-{
-////////////////////////////////
-float T=(TWO_PI/verts*i);
-float r=sin(obj.pins*T)-2*cos(T);
+	//first pass
+	z = pd;
+	int pn2 = pn - 1;
+	  
+	for (int i = 0; i <= verts; i++) {
+		float T=(TWO_PI/verts*i);
+		float r=sin(obj.pins*T)-2*cos(T);
 
-x = pX/sf-r*sin(T-rotate)*(radius/2);
-y = pY/sf-r*cos(T-rotate)*(radius/2);
-/////////////////////////////////
+		x = pX/sf-r*sin(T-rotate)*(radius/2);
+		y = pY/sf-r*cos(T-rotate)*(radius/2);
 
-if (i == 0) 
-{
-gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"f" + feedrate,1);
-}
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-//done first pass
+		if (i == 0) {
+			gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
+			gcode = splice(gcode,"g4p0.5",1);
+			gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+			gcode = splice(gcode,"g4p0.5",1);
+			gcode = splice(gcode,"f" + feedrate,1);
+		}
+		else {
+			gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+		}
+	} 
 
-//if multiple pass
-while (pn2 != 0)
-{
-pd = pd + z;
-for (int i = 0; i <= verts; i++) 
-{
+	//if multiple pass
+	while (pn2 != 0) {
+		pd = pd + z;
+		for (int i = 0; i <= verts; i++) {
 
+			float T=(TWO_PI/verts*i);
+			float r=sin(obj.pins*T)-2*cos(T);
 
-////////////////////////////////
-float T=(TWO_PI/verts*i);
-float r=sin(obj.pins*T)-2*cos(T);
-
-x = pX/sf-r*sin(T-rotate)*(radius/2);
-y = pY/sf-r*cos(T-rotate)*(radius/2);
-/////////////////////////////////
-
-
-
-if (i == 0) 
-{
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"f" + feedrate,1);
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-pn2 = pn2 -1;
-}
-gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
-//reset
-z = obj.cut_depth;
-pn = obj.pn;
-pd = z/pn;
+			x = pX/sf-r*sin(T-rotate)*(radius/2);
+			y = pY/sf-r*cos(T-rotate)*(radius/2);
+		
+			if (i == 0) {
+				gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+				gcode = splice(gcode,"g4p0.5",1);
+				gcode = splice(gcode,"f" + feedrate,1);
+				gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+			}
+			else {
+				gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+			}
+		} 
+		pn2 = pn2 -1;
+	}
+	gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
+	
+	//reset
+	z = obj.cut_depth;
+	pn = obj.pn;
+	pd = z/pn;
 }
 
 ////////////////////////////
