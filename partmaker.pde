@@ -155,7 +155,7 @@ int pn = 1;//number of passes
 float pd = z/pn;//pass depth when pn > 1
 float zd = z;//display z
 
-int wax = obj.wax;//work area of machine (mm)
+int wax = obj.wax; //work area of machine (mm)
 int way = obj.way;
 
 float sf = $(window).height()/way;  //display scale factor
@@ -186,7 +186,6 @@ PFont font;
 String[] fontList = PFont.list();
 String[] raw;
 
-///////////////////////////////////////////////////////////////////
 public void setup() {
 	size(width, height);
 	background(0);
@@ -208,8 +207,6 @@ public void setup() {
 	textFont(font);
 }
 
-
-///////////////////////////////////////////////////////////////////
 public void draw() 
 {
 	if(obj.resize == true){
@@ -484,8 +481,7 @@ void makegcode()
 }
 
 // write gcode
-void header(){
-
+void header() {
 	translate(0, height);
 	scale(1,-1);
 	//gcode header
@@ -498,14 +494,12 @@ void header(){
 	//gcode = splice(gcode,"g4p0.5",1);
 }
 
-///////////////////////////////////////////////////////////////////
 void footer() {
 	gcode = splice(gcode,"m5",1);
 	gcode = splice(gcode,"g0x0y0z"+nf(sh,1,3),1);
 	gcode = splice(gcode,"m30",1);
 }
 
-///////////////////////////////////////////////////////////////////
 void makepolygon(){   
 	//first pass
 	z = pd;
@@ -615,17 +609,14 @@ void makepolygonpocket() {
 	//end pocket
 }
 
-///////////////////////////////////////////////////////////////////
 void mouseOver() {
 	scolor = color(200,100,200);
 }
 
-///////////////////////////////////////////////////////////////////
 void mouseOut() {
 	scolor = color(0,128,255);
 }
 
-/////////////////////////////////////////////////
 void makestarz()
 {
 	//first pass
@@ -1048,152 +1039,123 @@ void makeporcupine(){
 	pd = z/pn;
 }
 
-////////////////////////////
-
-
 void graffiti()
 {
 
-if (mousePressed && (mouseButton == LEFT)) {
+	if (mousePressed && (mouseButton == LEFT)) {
+		gfx = splice(gfx,pX/sf);
+		gfy = splice(gfy,pY/sf);
 
-gfx = splice(gfx,pX/sf);
-gfy = splice(gfy,pY/sf);
+		beginShape();
+		for (int i = gfx.length-2; i > 0; i--) {
+			vertex(gfx[i]*sf,gfy[i]*sf);
+		}
+		endShape();
+	}
 
-beginShape();
-for (int i = gfx.length-2; i > 0; i--) {
-vertex(gfx[i]*sf,gfy[i]*sf);
-}
-endShape();
-}
+	if(row >0) {
+		int i2 = row;
+		while (i2 > 0)
+		{
+			i2--;
+			curvesx=vx.get(i2);
+			curvesy=vy.get(i2);
 
-if(row >0) {
-int i2 = row;
-while (i2 > 0)
-{
-i2--;
-curvesx=vx.get(i2);
-curvesy=vy.get(i2);
+			beginShape();
+			for (int i = curvesx.length-2; i > 0; i--) {
+			vertex(curvesx[i]*sf,curvesy[i]*sf);
+			}
+			endShape();
+		}
+	}
 
-beginShape();
-for (int i = curvesx.length-2; i > 0; i--) {
-vertex(curvesx[i]*sf,curvesy[i]*sf);
-}
-endShape();
-
-}
-}
 }
 
 void mouseReleased() {
 
+	if(obj.dgraffiti == true){
 
-if(obj.dgraffiti == true){
+		vx.add(gfx);
+		vy.add(gfy);
 
-vx.add(gfx);
-vy.add(gfy);
+		gfx={};
+		gfy={};
 
-gfx={};
-gfy={};
+		row++;
 
-row++;
+	}
 
 }
-
-}
-
-/////////////////////////////////////////////////
 
 void makegraffiti(){   
-//first pass
+	//first pass
 
-int i2 = 0;
-while (i2 < row){
+	int i2 = 0;
+	while (i2 < row){
 
-z = pd;
-int pn2 = pn - 1;
+		z = pd;
+		int pn2 = pn - 1;
 
 
-curvesx=vx.get(i2);
-curvesy=vy.get(i2);
+		curvesx=vx.get(i2);
+		curvesy=vy.get(i2);
 
-  
-for (int i = curvesx.length-2; i > 0; i--)
-{
-////////////////////////////////
+	  
+		for (int i = curvesx.length-2; i > 0; i--) {
+			x = curvesx[i];
+			y = curvesy[i];
 
-x = curvesx[i];
-y = curvesy[i];
-/////////////////////////////////
+			if (i == curvesx.length-2) {
+				gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
+				gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+				gcode = splice(gcode,"g4p0.5",1);
+				gcode = splice(gcode,"f" + feedrate,1);
+			}
+			else {
+				gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+			}
+		} 
 
-if (i == curvesx.length-2) 
-{
+		//if multiple pass
+		while (pn2 != 0) {
+			pd = pd + z;
+			for (int i = curvesx.length-2; i > 0; i--) {
+				x = curvesx[i];
+				y = curvesy[i];
 
-gcode = splice(gcode,"g0x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);//go to first cut
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"f" + feedrate,1);
-}
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-//done first pass
+				if (i == curvesx.length-2) {
+					gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
+					gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+					gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
+					gcode = splice(gcode,"g4p0.5",1);
+					gcode = splice(gcode,"f" + feedrate,1);
+				}
+				else {
+					gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
+				}
+			} 
+			pn2 = pn2 -1;
+		}
+		gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
 
-//if multiple pass
-while (pn2 != 0)
-{
-pd = pd + z;
-for (int i = curvesx.length-2; i > 0; i--)
-{
-
-////////////////////////////////
-
-x = curvesx[i];
-y = curvesy[i];
-
-/////////////////////////////////
-
-if (i == curvesx.length-2) 
-{
-gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-gcode = splice(gcode,"g1z" + nf(pd,1,3) + "f" + plungerate,1); //go to cut depth
-gcode = splice(gcode,"g4p0.5",1);
-gcode = splice(gcode,"f" + feedrate,1);
-
-}
-else 
-{
-gcode = splice(gcode,"g1x" + nf(x, 1, 3) + "y" + nf(y, 1, 3),1);
-}
-} 
-pn2 = pn2 -1;
-}
-gcode = splice(gcode,"g0z"+nf(sh,1,3),1);
-
-//reset
-z = obj.cut_depth;
-pn = obj.pn;
-pd = z/pn;
-i2++;
-}
+		//reset
+		z = obj.cut_depth;
+		pn = obj.pn;
+		pd = z/pn;
+		i2++;
+	}
 }
 
-public void resizeSketch()
-{
-sf = $(window).height()/way;
-height = $(window).height()-30;
-size(wax*sf, height);
-
+public void resizeSketch() {
+	sf = $(window).height()/way;
+	height = $(window).height()-30;
+	size(wax*sf, height);
 }
 
 public void resize()
 {
-
-way=obj.way;
-wax=obj.wax;
-
+	way=obj.way;
+	wax=obj.wax;
 }
 
 
