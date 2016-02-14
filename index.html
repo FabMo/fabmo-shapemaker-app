@@ -1,20 +1,27 @@
 <!doctype html>
 <html>
+<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8"/>
 	<head>
-		<title>Part Maker</title>
+		<title>Shape Maker</title>
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 	</head>
 
 	<body>
-		<canvas id="mycanvas" data-processing-sources="partmaker.pde"></canvas>
+		<canvas id="mycanvas" data-processing-sources="shapemaker.pde"></canvas>
 		<a id="download-link" style="display:none;"><b>DOWNLOAD GCODE</b></a>
 		<p><a id="reload" class="startover" style="display:none;"><b>NEW PART</b></a>
 
 		<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
 		<script type="text/javascript" src="js/processing.min.js"></script>
 		<script type="text/javascript" src="js/dat.gui.min.js"></script>
-		<script type="text/javascript" src="js/dashboard.js"></script>
-		<script>
+		<script type="text/javascript" src="js/fabmo.js"></script>
+
+      <script type="text/javascript">
+        var fabmo = new FabMoDashboard();
+      </script>
+
+      <script type="text/javascript">
+
 			var pjs;
 			
 			$(document).ready(function() {
