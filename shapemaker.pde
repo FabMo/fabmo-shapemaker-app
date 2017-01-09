@@ -421,7 +421,7 @@ void header(){
    gcode = splice(gcode,"g21",1);//inch g20
    gcode = splice(gcode,"g0z"+nf(sh,1,3),1); //go safe height
    gcode = splice(gcode,"g0x0y0",1); //go home
-   gcode = splice(gcode,"m4",1);//turn on router
+   gcode = splice(gcode,"m3",1);//turn on router
 
 }
 
